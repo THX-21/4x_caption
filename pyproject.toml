@@ -1,0 +1,17 @@
+[project]
+name = "4x-caption"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "dotenv>=0.9.9",
+    "json-repair>=0.56.0",
+    "openai>=2.16.0",
+    "pillow>=12.1.0",
+    "tqdm>=4.67.3",
+    "transformers>=5.0.0",
+]
+
+[[tool.uv.index]]
+url = "https://mirrors.aliyun.com/pypi/simple/"
