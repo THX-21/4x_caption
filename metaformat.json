@@ -1,0 +1,62 @@
+{
+    "metadata": {
+        "imaging_time": "20240226",
+        "resolution": "0.8m",
+        "center_coordinates": {
+            "longitude": 139.653192,
+            "latitude": 35.289492
+        }
+    },
+    "scene_context": {
+        "scene_type": "Naval Base",
+        "time_of_day": "Late morning to early afternoon",
+        "weather_conditions": "Clear skies with good visibility; calm sea state with minimal wave activity",
+        "background_elements": [
+            "concrete finger piers",
+            "large floating drydock",
+            "shoreline infrastructure",
+            "parking lots",
+            "warehouses",
+            "tree-covered landmass"
+        ],
+        "arrangement": "Ships are clustered along multiple finger piers extending into the water, with one large vessel docked at a central pier and smaller vessels moored at adjacent berths",
+        "detail_description": "High-resolution satellite imagery captures a naval base with multiple warships moored at concrete finger piers extending into calm, dark waters. A large vessel, likely an aircraft carrier or amphibious assault ship, is docked at the main pier, while smaller naval craft are aligned at adjacent berths. Shoreline infrastructure includes warehouses, parking areas, and a tree-covered landmass. The scene is illuminated by bright, direct sunlight, indicating late morning to early afternoon under clear skies, with no visible wakes or movement suggesting all vessels are stationary."
+    },
+    "objects_enrichment": {
+        "Ship_001": {
+            "class": "37",
+            "position": [
+                0.614031,
+                0.838754,
+                0.33248,
+                0.235909
+            ],
+            "abs_coordinates": {
+                "longitude": 139.653979,
+                "latitude": 35.287155
+            },
+            "visual_appearance": "The vessel features a long, flat flight deck with multiple white aircraft parking markings, including large 'X' patterns and rectangular outlines, indicating a design for aircraft operations. The superstructure is located toward the stern, with a prominent island structure housing the bridge and radar systems. A single, tall mast is visible on the island, and the hull appears gray with a straight bow and a slightly angled stern. No visible funnels or large deck-mounted weapons are apparent, consistent with an aircraft carrier or amphibious assault ship configuration.",
+            "activity_status": "Stationary/Docked",
+            "immediate_surroundings": "Moored alongside a pier at the center-bottom of the port area, with two other vessels positioned closely to its up-left, indicating a clustered berth arrangement. The vessel is situated within a sheltered basin, adjacent to a quay with visible port infrastructure and mooring dolphins.",
+            "spatial_context": "--- Ship_001 ---\nGlobal Position: Center-Bottom\nRelative Relations (Top-8 Neighbors):\n  - vs Ship_002: Moderate(dist: 0.36), located to the Up-Left.\n  - vs Ship_003: Moderate(dist: 0.38), located to the Up-Left.\n  - vs Ship_004: Far(dist: 0.67), located to the Up-Left.\n"
+        },
+        "Ship_002": {
+            "class": "10",
+            "position": [
+                0.499991,
+                0.496651,
+                0.129371,
+                0.175207
+            ],
+            "abs_coordinates": {
+                "longitude": 139.653192,
+                "latitude": 35.289515
+            },
+            "visual_appearance": "The vessel features a gray hull with a sharply raked bow and a streamlined superstructure. The superstructure is tiered and blocky, housing a bridge and multiple radar domes, with a tall mast positioned aft of the bridge. A single, slender funnel is visible midships, and the deck is equipped with what appear to be weapon systems and cranes. The ship exhibits a modern warship design with angular features and a low-profile profile.",
+            "activity_status": "Stationary/Docked",
+            "immediate_surroundings": "Positioned alongside a pier in the center-middle of the port, with Ship_003 moored very close to its up-left, suggesting a tandem berthing configuration. The vessel is located near a fairway leading to the open water, with additional mooring infrastructure visible nearby.",
+            "spatial_context": "--- Ship_002 ---\nGlobal Position: Center-Middle\nRelative Relations (Top-8 Neighbors):\n  - vs Ship_003: Very Close(dist: 0.03), located to the Up-Left.\n  - vs Ship_001: Moderate(dist: 0.36), located to the Down-Right.\n  - vs Ship_004: Moderate(dist: 0.36), located to the Up-Left.\n"
+        },
+        ...more ships...
+    }
+}
