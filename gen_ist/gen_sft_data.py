@@ -4,6 +4,8 @@ import os
 import random
 from dotenv import load_dotenv
 from openai import OpenAI
+from tqdm import tqdm
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from prompt_en.image_caption import CaptionTemplateEngine
 from prompt_en.object_detection import DetectionTemplateEngine
 from prompt_en.visual_grounding import VisualGroundingTemplateEngine
@@ -154,16 +156,21 @@ if __name__ == "__main__":
     os.makedirs(out_dir, exist_ok=True)
     
     json_files = [f for f in os.listdir(train_dir) if f.endswith(".json")]
+    json_files = json_files[:50]
     
-    for filename in sorted(json_files):
+    to_process = sorted([f for f in json_files if not os.path.exists(os.path.join(out_dir, f))])
+    def worker(filename):
         out_path = os.path.join(out_dir, filename)
-        if os.path.exists(out_path):
-            continue
-            
-        print(f"Processing {filename}...")
         with open(os.path.join(train_dir, filename), "r") as f:
             raw_data = json.load(f)
-        
         res = generator.process_image_data(filename.replace(".json", ""), raw_data)
         with open(out_path, "w", encoding="utf-8") as f:
             json.dump(res, f, indent=4, ensure_ascii=False)
+        return filename
+    if to_process:
+        with ThreadPoolExecutor(max_workers=4) as ex:
+            futures = [ex.submit(worker, fn) for fn in to_process]
+            pbar = tqdm(total=len(futures), desc="生成 SFT 数据")
+            for _ in as_completed(futures):
+                pbar.update(1)
+            pbar.close()
