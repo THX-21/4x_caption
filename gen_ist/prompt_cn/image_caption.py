@@ -104,6 +104,26 @@ class CaptionTemplateEngine:
             "请描述该遥感场景中体现出的空间几何秩序。"
         ]
 
+    def flatten_data(self, raw_data):
+        """为 CaptionEngine 准备扁平化数据"""
+        # 合并所有目标的 spatial_context
+        spatial_contexts = []
+        for obj_id, obj_data in raw_data.get("objects_enrichment", {}).items():
+            if "spatial_context" in obj_data:
+                spatial_contexts.append(obj_data["spatial_context"])
+        
+        combined_spatial_context = " ".join(spatial_contexts) if spatial_contexts else "N/A"
+        
+        return {
+            'time_of_day': raw_data["scene_context"]["time_of_day"],
+            'coordinates': f"{raw_data['metadata']['center_coordinates']['latitude']}N, {raw_data['metadata']['center_coordinates']['longitude']}E",
+            'weather': raw_data["scene_context"]["weather_conditions"],
+            'arrangement': raw_data["scene_context"]["arrangement"],
+            'detail': raw_data["scene_context"]["detail_description"],
+            'background_elements': ", ".join(raw_data["scene_context"]["background_elements"]),
+            'spatial_context': combined_spatial_context
+        }
+
     def get_prompts(self, data):
         """
         data: 传入包含 time_of_day, coordinates, weather 等字段的字典

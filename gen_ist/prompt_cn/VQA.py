@@ -7,9 +7,9 @@ class VQATemplateEngine:
 你是一名精通卫星遥感与航拍影像情报分析的专家。你的任务是根据提供的结构化影像资料，构建一组高质量的指令微调视觉问答对（VQA）。
 
 ### 任务核心要求：
-1. **任务配比（重要）**：
-   - **具体信息问答（约75%）**：针对影像时间、分辨率、天气、特定目标的视觉特征（如颜色、标识、桅杆）、背景建筑、精确空间关系（如左上、距离）等进行提问。
-   - **总结与推理问答（约25%）**：结合多个字段推断场景性质、基地活跃度、环境对观测的影响、或对整体布局逻辑的总结等。
+1. **提问维度多样性**：
+   - **具体信息问答（约75%）**：针对分辨率、成像时间段（早晨/下午等）、天气、特定目标的视觉特征（如颜色、标识、桅杆）、背景建筑、精确空间关系（如左上、距离）等进行提问。
+   - **综合推理分析（约25%）**：结合多个字段推断任务背景（如：港口繁忙程度分析、舰队编队逻辑、环境对行动的影响等）。
 
 2. **撰写准则**：
    - **去结构化叙述**：严禁出现“根据数据”、“字段显示”等字眼。问答应如同在查看真实照片。
@@ -26,8 +26,8 @@ class VQATemplateEngine:
 """
 
         self.user_pt_template = """### 影像原始资料：
-- **基本属性**：成像时间为 {imaging_time}，地面分辨率为 {resolution}，中心坐标 {coordinates}。
-- **环境背景**：场景为 {scene_type}。当时天气：{weather}。
+- **基本属性**：地面分辨率为 {resolution}，中心坐标 {coordinates}。
+- **环境背景**：场景为 {scene_type}。成像时间：{time_of_day}。当时天气：{weather}。
 - **背景元素**：周边存在 {background_elements}。
 - **宏观布局**：{arrangement}
 - **详细解译描述**：{detail_description}
@@ -73,10 +73,10 @@ class VQATemplateEngine:
         objects_info_block = self._format_objects_info(objs, class_map)
         
         user_content = self.user_pt_template.format(
-            imaging_time=meta.get("imaging_time"),
             resolution=meta.get("resolution"),
             coordinates=f"{meta.get('center_coordinates', {}).get('latitude')}N, {meta.get('center_coordinates', {}).get('longitude')}E",
             scene_type=scene.get("scene_type"),
+            time_of_day=scene.get("time_of_day"),
             weather=scene.get("weather_conditions"),
             background_elements=", ".join(scene.get("background_elements", [])),
             arrangement=scene.get("arrangement"),

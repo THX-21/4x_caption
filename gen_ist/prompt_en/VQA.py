@@ -6,10 +6,10 @@ class VQATemplateEngine:
         self.sys_pt = """### Role: Remote Sensing Image Interpretation Expert
 You are an expert proficient in satellite remote sensing and aerial image intelligence analysis. Your task is to build a set of high-quality instruction fine-tuning Visual Question Answering (VQA) pairs based on the provided structured image data.
 
-### Task Core Requirements:
-1. **Task Ratio (Important)**:
-   - **Specific Information Q&A (approx. 75%)**: Questions about imaging time, resolution, weather, visual features of specific targets (e.g., color, markings, masts), background buildings, precise spatial relationships (e.g., top-left, distance), etc.
-   - **Summary and Reasoning Q&A (approx. 25%)**: Combine multiple fields to infer scene nature, base activity, impact of environment on observation, or summary of overall layout logic, etc.
+### Core Task Requirements:
+1. **Question Dimension Diversity**:
+   - **Specific Information Q&A (approx. 75%)**: Ask questions about resolution, time of day (morning/afternoon, etc.), weather, visual features of specific targets (e.g., color, markings, masts), background buildings, precise spatial relationships (e.g., top-left, distance), etc.
+   - **Comprehensive Reasoning Analysis (approx. 25%)**: Infer the mission context based on multiple fields (e.g., analysis of port busyness, fleet formation logic, impact of environment on operations, etc.).
 
 2. **Writing Guidelines**:
    - **De-structured Narrative**: Words like "according to data" or "field shows" are strictly prohibited. Q&A should be like looking at a real photo.
@@ -26,8 +26,8 @@ Must return in pure JSON list format, each element containing Instruction and An
 """
 
         self.user_pt_template = """### Image Raw Materials:
-- **Basic Attributes**: Imaging time is {imaging_time}, ground resolution is {resolution}, center coordinates {coordinates}.
-- **Environmental Background**: Scene is {scene_type}. Weather at the time: {weather}.
+- **Basic Attributes**: Ground resolution is {resolution}, center coordinates {coordinates}.
+- **Environmental Background**: Scene is {scene_type}. Time of day: {time_of_day}. Weather at the time: {weather}.
 - **Background Elements**: Surrounding exists {background_elements}.
 - **Macro Layout**: {arrangement}
 - **Detailed Interpretation Description**: {detail_description}
@@ -73,10 +73,10 @@ Please generate a set of (10-12 in total) professional Q&A pairs based on the ab
         objects_info_block = self._format_objects_info(objs, class_map)
         
         user_content = self.user_pt_template.format(
-            imaging_time=meta.get("imaging_time"),
             resolution=meta.get("resolution"),
             coordinates=f"{meta.get('center_coordinates', {}).get('latitude')}N, {meta.get('center_coordinates', {}).get('longitude')}E",
             scene_type=scene.get("scene_type"),
+            time_of_day=scene.get("time_of_day"),
             weather=scene.get("weather_conditions"),
             background_elements=", ".join(scene.get("background_elements", [])),
             arrangement=scene.get("arrangement"),

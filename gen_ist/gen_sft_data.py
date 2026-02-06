@@ -34,7 +34,7 @@ class SFTDataGenerator:
         try:
             response = client.chat.completions.create(
                 # model="deepseek-chat",
-                model="deepseek-reasoner",
+                model="deepseek-chat",
                 messages=[
                     {"role": "system", "content": enhanced_sys_pt},
                     {"role": "user", "content": user_pt}
@@ -51,8 +51,8 @@ class SFTDataGenerator:
         """处理单张图像数据，生成不同任务的 SFT 数据"""
         sft_results = []
 
-        # 1. Image Caption (调用 LLM)
-        sys_pt, user_pt = self.caption_engine.get_prompts(self._flatten_caption_data(raw_data))
+        # 1. 生成 Caption 数据
+        sys_pt, user_pt = self.caption_engine.get_prompts(self.caption_engine.flatten_data(raw_data))
         caption_res = self.call_llm(sys_pt, user_pt)
         if caption_res:
             for style, content in caption_res.items():
@@ -131,32 +131,16 @@ class SFTDataGenerator:
 
         return sft_results
 
-    def _flatten_caption_data(self, raw_data):
-        """为 CaptionEngine 准备扁平化数据"""
-        # 简单取第一个目标的 spatial_context 作为示例，实际可能需要更复杂的逻辑
-        first_obj_id = list(raw_data["objects_enrichment"].keys())[0]
-        first_obj = raw_data["objects_enrichment"][first_obj_id]
-        
-        return {
-            'time_of_day': raw_data["scene_context"]["time_of_day"],
-            'coordinates': f"{raw_data['metadata']['center_coordinates']['latitude']}N, {raw_data['metadata']['center_coordinates']['longitude']}E",
-            'weather': raw_data["scene_context"]["weather_conditions"],
-            'arrangement': raw_data["scene_context"]["arrangement"],
-            'detail': raw_data["scene_context"]["detail_description"],
-            'background_elements': ", ".join(raw_data["scene_context"]["background_elements"]),
-            'spatial_context': first_obj["spatial_context"]
-        }
-
 if __name__ == "__main__":
     my_class_map = {str(i): f"ship_type_{i}" for i in range(100)}
     generator = SFTDataGenerator(my_class_map)
     
-    train_dir = "../data/train"
+    train_dir = "/root/autodl-fs/data/metadata/train"
     out_dir = "data/train"
     os.makedirs(out_dir, exist_ok=True)
     
     json_files = [f for f in os.listdir(train_dir) if f.endswith(".json")]
-    json_files = json_files[:50]
+    json_files = json_files[50:100]
     
     to_process = sorted([f for f in json_files if not os.path.exists(os.path.join(out_dir, f))])
     def worker(filename):
@@ -167,10 +151,16 @@ if __name__ == "__main__":
         with open(out_path, "w", encoding="utf-8") as f:
             json.dump(res, f, indent=4, ensure_ascii=False)
         return filename
+    
+    DEBUG = True # 调试代码：串行调用
     if to_process:
-        with ThreadPoolExecutor(max_workers=4) as ex:
-            futures = [ex.submit(worker, fn) for fn in to_process]
-            pbar = tqdm(total=len(futures), desc="生成 SFT 数据")
-            for _ in as_completed(futures):
-                pbar.update(1)
-            pbar.close()
+        if DEBUG:
+            for fn in tqdm(to_process, desc="生成 SFT 数据 (串行调试)"):
+                worker(fn)
+        else:
+            with ThreadPoolExecutor(max_workers=4) as ex:
+                futures = [ex.submit(worker, fn) for fn in to_process]
+                pbar = tqdm(total=len(futures), desc="生成 SFT 数据")
+                for _ in as_completed(futures):
+                    pbar.update(1)
+                pbar.close()

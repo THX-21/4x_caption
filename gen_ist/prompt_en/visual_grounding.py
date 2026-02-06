@@ -23,7 +23,7 @@ Guide the model to find and lock the coordinates of specific targets in the imag
 - **Prohibited Terms**: Words like "metadata", "field", or "JSON" are strictly prohibited in the output content.
 
 ### Output Format:
-Must return pure JSON list format, each element containing Instruction (diversified questions) and Answer (containing coordinates [x, y, w, h]), format as follows:
+Must return pure JSON list format, each element containing Instruction (diversified questions) and Answer (containing coordinates [x_center, y_center, width, height]), format as follows:
 [
     {"Instruction": "...", "Answer": "..."},
     {"Instruction": "...", "Answer": "..."}

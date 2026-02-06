@@ -7,7 +7,7 @@ class DetectionTemplateEngine:
         self.type_1_instructions = [
             "Please identify and frame all ship targets in the image.", "Identify the positions of all vessels in the image and provide bounding boxes.",
             "Locate every ship target in the figure and output its pixel coordinates.", "Detect all ships appearing in the image and return their location information.",
-            "Find all vessels in the figure and provide [ymin, xmin, ymax, xmax] coordinates.", "Please perform target qualitative and positioning annotation for all visible ships in the figure.",
+            "Find all vessels in the figure and provide [x_center, y_center, width, height] coordinates.", "Please perform target qualitative and positioning annotation for all visible ships in the figure.",
             "Annotate the precise geometric boundaries of each ship in the image.", "Detect all ships in the figure and output their corresponding object detection boxes.",
             "Please delineate all maritime transport tools and warships in this area.", "Identify and extract the geographical location coordinate information of all ship targets in the figure.",
             "Please locate all vessel targets in the current scene.", "What ships are in the image? Please indicate them with bounding boxes.",
@@ -35,7 +35,7 @@ class DetectionTemplateEngine:
             "Please locate all {class_name} in the figure.", "Identify and frame all {class_name} targets in the image.",
             "Where are the {class_name} in the image? Please give their precise coordinates.", "Please detect all target entities belonging to the {class_name} class in the figure.",
             "Find the {class_name} in the figure and annotate their object detection boxes.", "Please locate all ship positions classified as {class_name}.",
-            "How many {class_name} are in the figure? Please give their coordinates in the image respectively.", "Identify {class_name} in the image and extract their [ymin, xmin, ymax, xmax] information.",
+            "How many {class_name} are in the figure? Please give their coordinates in the image respectively.", "Identify {class_name} in the image and extract their [x_center, y_center, width, height] information.",
             "Please give the precise bounding box sequence of all {class_name} in the figure.", "Detect and annotate every vessel belonging to the {class_name} model in the figure.",
             "Search for {class_name} in the figure and return their positions in the image coordinate system.", "Please accurately identify all {class_name} in the complex port background.",
             "Mark all {class_name} in the figure, excluding other interference targets.", "Which targets in the image belong to {class_name}? Please give their specific coordinate boxes.",

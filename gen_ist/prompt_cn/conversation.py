@@ -8,7 +8,7 @@ class ConversationTemplateEngine:
 
 ### 对话参与者设定：
 - **用户 (User)**：对影像内容感到好奇，或有特定的解译需求（如寻找目标、询问环境、确认坐标）。
-- **卫星图像解译助手 (Agent)**：具备专业视觉解译能力的辅助型 AI。它能通过自然语言描述影像细节，并能随时调取精确的边界框坐标 [ymin, xmin, ymax, xmax] 来辅助说明。
+- 卫星图像解译助手 (Agent)**：具备专业视觉解译能力的辅助型 AI。它能通过自然语言描述影像细节，并能随时调取精确的边界框坐标 [x_center, y_center, width, height] 来辅助说明。
 
 ### 对话生成准则：
 1. **全要素利用**：对话内容应尽可能自然地使用提供的基本属性、背景环境、细节特征及目标属性，确保对话内容丰富多样，不需要使用全部信息。
@@ -32,7 +32,6 @@ class ConversationTemplateEngine:
         self.user_pt_template = """### 影像原始要素全集：
 
 #### 1. 基本属性 (Metadata)
-- 成像时间：{imaging_time}
 - 地面分辨率：{resolution}
 - 中心坐标：经度 {lon}, 纬度 {lat}
 
@@ -52,16 +51,26 @@ class ConversationTemplateEngine:
     def _format_objects_info(self, objects_enrichment, class_map):
         """格式化所有目标信息，确保包含坐标、视觉特征和空间关联"""
         details = []
+        # 创建 ID 到编号的映射，例如 {"Ship_001": "1号船"}
+        id_to_num = {obj_id: f"{i+1}号船" for i, obj_id in enumerate(objects_enrichment.keys())}
+
         for obj_id, info in objects_enrichment.items():
             c_name = class_map.get(info['class'], "未知目标")
+            
+            # 替换 spatial_context 中的内部 ID
+            spatial_info = info['spatial_context'].strip()
+            sorted_ids = sorted(id_to_num.keys(), key=len, reverse=True)
+            for old_id in sorted_ids:
+                spatial_info = spatial_info.replace(old_id, id_to_num[old_id])
+
             detail = (
-                f"- 【目标实体】类别：{c_name}\n"
+                f"- {id_to_num[obj_id]}（{c_name}）：\n"
                 f"  - 边界框坐标：{info['position']}\n"
                 f"  - 经纬度位置：{info.get('abs_coordinates')}\n"
                 f"  - 视觉外观特征：{info['visual_appearance']}\n"
                 f"  - 当前活动状态：{info['activity_status']}\n"
                 f"  - 周边微观环境：{info['immediate_surroundings']}\n"
-                f"  - 空间位置关联：{info['spatial_context'].strip()}\n"
+                f"  - 空间位置关联：{spatial_info}\n"
             )
             details.append(detail)
         return "\n".join(details)
@@ -75,7 +84,6 @@ class ConversationTemplateEngine:
         objects_info = self._format_objects_info(objs, class_map)
         
         user_content = self.user_pt_template.format(
-            imaging_time=meta.get("imaging_time"),
             resolution=meta.get("resolution"),
             lon=meta.get("center_coordinates", {}).get("longitude"),
             lat=meta.get("center_coordinates", {}).get("latitude"),

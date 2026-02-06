@@ -23,7 +23,7 @@ class VisualGroundingTemplateEngine:
 - **严禁术语**：输出内容中严禁出现“元数据”、“字段”或“JSON”字样。
 
 ### 输出格式：
-必须返回纯 JSON 列表格式，每个元素包含 Instruction（多样化的提问）和 Answer（包含坐标 [x, y, w, h]），格式如下：
+必须返回纯 JSON 列表格式，每个元素包含 Instruction（多样化的提问）和 Answer（包含坐标 [x_center, y_center, width, height]），格式如下：
 [
     {{"Instruction": "...", "Answer": "..."}},
     {{"Instruction": "...", "Answer": "..."}}

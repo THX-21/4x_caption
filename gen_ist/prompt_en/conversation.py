@@ -8,7 +8,7 @@ You are now a multimodal instruction dataset generator. Your task is to create a
 
 ### Conversation Participant Settings:
 - **User**: Curious about image content, or has specific interpretation needs (e.g., searching for targets, asking about environment, confirming coordinates).
-- **Satellite Image Interpretation Agent**: An auxiliary AI with professional visual interpretation capabilities. It can describe image details through natural language and can call precise bounding box coordinates [ymin, xmin, ymax, xmax] at any time to assist in explanation.
+- Satellite Image Interpretation Agent: An auxiliary AI with professional visual interpretation capabilities. It can describe image details through natural language and can call precise bounding box coordinates [x_center, y_center, width, height] at any time to assist in explanation.
 
 ### Conversation Generation Guidelines:
 1. **Full Element Utilization**: Conversation content should use the provided basic attributes, background environment, detail features, and target attributes as naturally as possible, ensuring rich and diverse conversation content, without needing to use all information.
@@ -32,7 +32,6 @@ Must return in pure JSON format:
         self.user_pt_template = """### Complete Set of Image Raw Elements:
 
 #### 1. Basic Attributes (Metadata)
-- Imaging Time: {imaging_time}
 - Ground Resolution: {resolution}
 - Center Coordinates: Longitude {lon}, Latitude {lat}
 
@@ -52,16 +51,26 @@ Please generate a natural conversation between a "User" and an "Interpretation A
     def _format_objects_info(self, objects_enrichment, class_map):
         """Format all target information, ensuring coordinates, visual features, and spatial associations are included"""
         details = []
+        # Create mapping from ID to number, e.g., {"Ship_001": "Ship 1"}
+        id_to_num = {obj_id: f"Ship {i+1}" for i, obj_id in enumerate(objects_enrichment.keys())}
+
         for obj_id, info in objects_enrichment.items():
             c_name = class_map.get(info['class'], "Unknown Target")
+            
+            # Replace internal IDs in spatial_context
+            spatial_info = info['spatial_context'].strip()
+            sorted_ids = sorted(id_to_num.keys(), key=len, reverse=True)
+            for old_id in sorted_ids:
+                spatial_info = spatial_info.replace(old_id, id_to_num[old_id])
+
             detail = (
-                f"- [Target Entity] Category: {c_name}\n"
+                f"- {id_to_num[obj_id]} ({c_name}):\n"
                 f"  - Bounding Box Coordinates: {info['position']}\n"
                 f"  - Latitude and Longitude Position: {info.get('abs_coordinates')}\n"
                 f"  - Visual Appearance Features: {info['visual_appearance']}\n"
                 f"  - Current Activity Status: {info['activity_status']}\n"
                 f"  - Immediate Micro-environment: {info['immediate_surroundings']}\n"
-                f"  - Spatial Position Association: {info['spatial_context'].strip()}\n"
+                f"  - Spatial Position Association: {spatial_info}\n"
             )
             details.append(detail)
         return "\n".join(details)
@@ -75,7 +84,6 @@ Please generate a natural conversation between a "User" and an "Interpretation A
         objects_info = self._format_objects_info(objs, class_map)
         
         user_content = self.user_pt_template.format(
-            imaging_time=meta.get("imaging_time"),
             resolution=meta.get("resolution"),
             lon=meta.get("center_coordinates", {}).get("longitude"),
             lat=meta.get("center_coordinates", {}).get("latitude"),
