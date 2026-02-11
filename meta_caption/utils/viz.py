@@ -3,9 +3,9 @@ import os
 from PIL import Image, ImageDraw, ImageFont
 
 def visualize_ships(seq):
-    json_path = f"data/result_{seq}.json"
-    img_path = f"RGB/train/images/{seq}.tif"
-    output_path = f"data/viz_labeled_{seq}.png" # 导出为 PNG 方便查看
+    json_path = f"data/metadata/train/result_{seq}.json"
+    img_path = f"data/imgs/train/rgb_images/{seq}.jpg"
+    output_path = f"data/viz/train/labeled_{seq}.png" # 导出为 PNG 方便查看
 
     if not os.path.exists(json_path) or not os.path.exists(img_path):
         print(f"错误: 找不到 {json_path} 或图像文件")
@@ -54,8 +54,8 @@ def visualize_ships(seq):
     print(f"\n结果已保存至: {output_path}")
 
 if __name__ == "__main__":
-    seqs = ["00001", "00011", "00021", "00041","00051", "00061", "00071", "00081", "00091", "00101"]
+    seqs = ["00001", "00002", "00003", "00004", "00005", "00006", "00007", "00008", "00009", "00010"]
     for seq in seqs:
         print(f"Processing {seq}...")
         visualize_ships(seq)
-        print(f"Result saved to data/viz_labeled_{seq}.png")
+        print(f"Result saved to data/viz/train/labeled_{seq}.png")

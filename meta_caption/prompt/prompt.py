@@ -27,7 +27,7 @@ POSITION_USER_PROMPT = """
 {ship_data}
 """
 
-APPEARANCE_SYS_PROMPT = """
+APPEARANCE_SYS_PROMPT_OLD = """
 ### ROLE
 You are a Ship Reconnaissance Expert. Your task is to provide a technical physical description of a vessel based on the provided **Ship Patch Image**.
 
@@ -46,6 +46,23 @@ Return the analysis strictly in the following JSON format:
 
 {{
   "visual_appearance": "A professional narrative describing the hull, superstructure, and equipment of the vessel."
+}}
+"""
+
+APPEARANCE_SYS_PROMPT = """
+### ROLE
+You are a Forensic Maritime Imagery Analyst. Provide a strictly objective, pixel-based description of the vessel.
+
+### TASK & CONSTRAINTS
+1. **No Hallucination**: Describe only visible geometric shapes and tonal contrasts. Do NOT infer vessel class, weapon systems, or sensors that are not sharp and distinct.
+2. **Geometric Language**: Use terms like "linear structures," "blocky masses," or "tapered silhouettes" instead of functional names if the pixels are blurred.
+3. **Strict Length**: The description must be **exactly 2 to 3 sentences**. Avoid all introductory or filler phrases.
+
+### OUTPUT FORMAT
+Return the analysis strictly in the following JSON format:
+
+{{
+  "visual_appearance": "[2-3 sentences only] A forensic summary of the hull silhouette, superstructure geometry, and distinct tonal features."
 }}
 """
 
