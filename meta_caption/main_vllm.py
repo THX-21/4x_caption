@@ -14,7 +14,7 @@ data_dir = "data/metadata/train"
 handler = VLLMTaskHandler(data_dir=data_dir)
 
 # gather all image sequence ids from rgb_images folder
-rgb_dir = "/root/autodl-fs/RGB/test/rgb_images"
+rgb_dir = "/root/autodl-fs/data/imgs/train/rgb_images"
 try:
     seqs_all = sorted([os.path.splitext(f)[0] for f in os.listdir(rgb_dir) if f.lower().endswith('.jpg')])
 except Exception as e:
@@ -31,7 +31,7 @@ handler.set_progress_bar(progress)
 
 for seq in seqs:
     print(f"--- Processing {seq} ---")
-    tif, lbl, jpg = f"/root/autodl-fs/RGB/test/images/{seq}.tif", f"/root/autodl-fs/RGB/test/labels/{seq}.json", f"/root/autodl-fs/RGB/test/rgb_images/{seq}.jpg"
+    tif, lbl, jpg = f"/root/autodl-fs/data/imgs/train/images/{seq}.tif", f"/root/autodl-fs/data/imgs/train/labels/{seq}.json", f"/root/autodl-fs/data/imgs/train/rgb_images/{seq}.jpg"
     if not os.path.exists(jpg): continue
     
     full_img = Image.open(jpg).convert("RGB")
