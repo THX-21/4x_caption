@@ -10,10 +10,8 @@ from PIL import Image
 from vllm_handler import VLLMTaskHandler
 
 # 1. 初始化任务处理器
-handler = VLLMTaskHandler()
-
-data_dir = "data/metadata"
-os.makedirs(data_dir, exist_ok=True)
+data_dir = "data/metadata/train"
+handler = VLLMTaskHandler(data_dir=data_dir)
 
 # gather all image sequence ids from rgb_images folder
 rgb_dir = "/root/autodl-fs/RGB/test/rgb_images"

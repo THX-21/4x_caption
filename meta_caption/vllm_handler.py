@@ -5,10 +5,12 @@ from vllm import LLM, SamplingParams
 from transformers import AutoProcessor
 
 class VLLMTaskHandler:
-    def __init__(self, model_id="Qwen/Qwen3-VL-32B-Instruct", chunk_size=8, gpu_memory_utilization=0.9):
+    def __init__(self, model_id="Qwen/Qwen3-VL-32B-Instruct", chunk_size=8, gpu_memory_utilization=0.9, data_dir="data/metadata/train"):
         os.environ["VLLM_USE_MODELSCOPE"] = "False"
         self.model_id = model_id
         self.chunk_size = chunk_size
+        self.data_dir = data_dir
+        os.makedirs(self.data_dir, exist_ok=True)
         self.llm = LLM(
             model=model_id, 
             limit_mm_per_prompt={"image": 1}, 
@@ -42,7 +44,7 @@ class VLLMTaskHandler:
     def save_result(self, seq):
         meta = self.all_metas.get(seq)
         if not meta: return
-        output_path = f"data/metadata/result_{seq}.json"
+        output_path = os.path.join(self.data_dir, f"result_{seq}.json")
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(meta, f, indent=4, ensure_ascii=False)
         print(f"Saved: {output_path}")

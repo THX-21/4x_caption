@@ -16,10 +16,8 @@ UPDATE_APPEARANCE = True  # 更新视觉外观 (visual_appearance)
 # ==========================================
 
 # 1. 初始化任务处理器
-handler = VLLMTaskHandler()
-
-data_dir = "data/metadata"
-os.makedirs(data_dir, exist_ok=True)
+data_dir = "data/metadata/train"
+handler = VLLMTaskHandler(data_dir=data_dir)
 
 rgb_dir = "/root/autodl-fs/RGB/test/rgb_images"
 try:
@@ -39,7 +37,7 @@ progress = tqdm(total=len(seqs), desc="Updating metadata")
 handler.set_progress_bar(progress)
 
 for seq in seqs:
-    output_path = os.path.join("data", f"result_{seq}.json")
+    output_path = os.path.join(data_dir, f"result_{seq}.json")
     jpg = f"/root/autodl-fs/RGB/test/rgb_images/{seq}.jpg"
     
     with open(output_path, "r", encoding="utf-8") as f:
