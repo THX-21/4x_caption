@@ -34,7 +34,7 @@ class SFTDataGenerator:
         try:
             response = client.chat.completions.create(
                 # model="deepseek-chat",
-                model="deepseek-chat",
+                model=os.getenv("OPENAI_MODEL"),
                 messages=[
                     {"role": "system", "content": enhanced_sys_pt},
                     {"role": "user", "content": user_pt}

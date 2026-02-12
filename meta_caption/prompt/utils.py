@@ -1,12 +1,15 @@
 import os, json, re
-from osgeo import gdal
+import rasterio
 
 def extract_normalized_info(tif_path, json_path):
     # 1. 获取地理变换参数
-    ds = gdal.Open(tif_path)
-    gt = ds.GetGeoTransform()
-    center_lon = gt[0] + (ds.RasterXSize/2) * gt[1] + (ds.RasterYSize/2) * gt[2]
-    center_lat = gt[3] + (ds.RasterXSize/2) * gt[4] + (ds.RasterYSize/2) * gt[5]
+    with rasterio.open(tif_path) as ds:
+        gt = ds.transform
+        width, height = ds.width, ds.height
+        # rasterio transform: (a, b, c, d, e, f) 对应 GDAL: (c, a, b, f, d, e)
+        # gt[2] 是左上角 x, gt[0] 是 x 分辨率, gt[1] 是旋转
+        # gt[5] 是左上角 y, gt[3] 是旋转, gt[4] 是 y 分辨率
+        center_lon, center_lat = ds.xy(height // 2, width // 2)
 
     # 2. 解析 JSON 标签
     with open(json_path, 'r', encoding='utf-8') as f:
@@ -40,8 +43,7 @@ def extract_normalized_info(tif_path, json_path):
         x_c, y_c = (min_x + max_x) / 2, (min_y + max_y) / 2
         
         # 计算绝对经纬度
-        lon = gt[0] + x_c * gt[1] + y_c * gt[2]
-        lat = gt[3] + x_c * gt[4] + y_c * gt[5]
+        lon, lat = ds.xy(y_c, x_c)
         
         ship_id = f"Ship_{i+1:03d}"
         result["objects_enrichment"][ship_id] = {

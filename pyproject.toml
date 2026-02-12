@@ -6,9 +6,12 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "dotenv>=0.9.9",
+    "google>=3.0.0",
+    "google-genai>=1.62.0",
     "json-repair>=0.56.0",
     "openai>=2.16.0",
     "pillow>=12.1.0",
+    "rasterio>=1.4.4",
     "tqdm>=4.67.3",
     "transformers>=5.0.0",
 ]
