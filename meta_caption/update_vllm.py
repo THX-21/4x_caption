@@ -11,15 +11,16 @@ from vllm_handler import VLLMTaskHandler
 # 更新配置 (设置为 True 以重新运行对应任务)
 # ==========================================
 UPDATE_GENERAL = False    # 更新场景上下文 (scene_context)
-UPDATE_POSITION = False   # 更新空间环境 (immediate_surroundings)
-UPDATE_APPEARANCE = True  # 更新视觉外观 (visual_appearance)
+UPDATE_POSITION = True    # 更新空间环境 (immediate_surroundings)
+UPDATE_APPEARANCE = False  # 更新视觉外观 (visual_appearance)
+UPDATE_SPATIAL_RULE = True # 更新基于规则的方位推导 (spatial_context)
 # ==========================================
 
 # 1. 初始化任务处理器
-data_dir = "data/metadata/train"
+data_dir = "data/metadata/test"
 handler = VLLMTaskHandler(data_dir=data_dir)
 
-rgb_dir = "/root/autodl-fs/data/imgs/train/rgb_images"
+rgb_dir = "/root/autodl-fs/data/imgs/test/rgb_images"
 try:
     seqs_all = sorted([os.path.splitext(f)[0] for f in os.listdir(rgb_dir) if f.lower().endswith('.jpg')])
 except Exception as e:
@@ -36,7 +37,7 @@ if not seqs:
 progress = tqdm(total=len(seqs), desc="Updating metadata")
 handler.set_progress_bar(progress)
 
-for seq in seqs:
+for seq in seqs[:]:
     output_path = os.path.join(data_dir, f"result_{seq}.json")
     jpg = os.path.join(rgb_dir, f"{seq}.jpg")
     
@@ -44,6 +45,12 @@ for seq in seqs:
         meta = json.load(f)
     handler.all_metas[seq] = meta
     
+    # 0. 更新基于规则的方位推导 (不依赖 LLM)
+    if UPDATE_SPATIAL_RULE:
+        spatial_dict = format_ship_spatial_text(meta["objects_enrichment"], top_k=20) # 这里的 top_k 可以根据需求设置
+        for s_id, spatial_text in spatial_dict.items():
+            meta["objects_enrichment"][s_id]["spatial_context"] = spatial_text
+
     # 计算需要运行的任务数
     task_count = 0
     if UPDATE_GENERAL: task_count += 1
@@ -53,8 +60,11 @@ for seq in seqs:
     handler.tasks_remaining[seq] = task_count
     
     if task_count == 0:
-        print(f"No update tasks selected for {seq}, skipping.")
-        progress.update(1)
+        if UPDATE_SPATIAL_RULE:
+            handler.save_result(seq)
+        else:
+            print(f"No update tasks selected for {seq}, skipping.")
+            progress.update(1)
         continue
 
     full_img = Image.open(jpg).convert("RGB")

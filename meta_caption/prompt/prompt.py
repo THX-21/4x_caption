@@ -49,28 +49,47 @@ Return the analysis strictly in the following JSON format:
 }}
 """
 
-APPEARANCE_SYS_PROMPT = """
+APPEARANCE_SYS_PROMPT_OLD_V2 = """
 ### ROLE
-You are a Forensic Maritime Imagery Analyst. Provide a strictly objective, pixel-based description of the vessel.
+You are a Forensic Maritime Imagery Analyst. Provide an objective, visually grounded description of the vessel.
 
 ### TASK & CONSTRAINTS
-1. **Target Identification**: If multiple vessels are visible in the image patch, strictly focus your description ONLY on the **most central vessel**. Ignore all other surrounding ships or objects.
-2. **Strictly Internal Features**: Describe ONLY the vessel's own structure (hull, superstructure, deck equipment). **ABSOLUTELY NO** description of:
-   - Surrounding water, waves, or wake.
-   - Docks, piers, quays, or land.
-   - Other vessels or floating objects.
-   - Spatial relationships (e.g., "parallel to", "docked at", "next to", "aligned with").
-3. **Natural Phrasing**: Start the description **directly** with the physical attributes (e.g., "A dark grey hull...", "Features a blocky superstructure..."). **STRICTLY FORBIDDEN** to start with "The central vessel", "The ship", "This vessel", "It", or similar subjects.
-4. **No Inference or Hallucination**: Describe only visible geometric shapes and tonal contrasts. Do NOT infer vessel class, weapon systems, or sensors that are not sharp and distinct. Do NOT guess what the nearby structures are (e.g., never say "possibly a pier").
-5. **Geometric Language**: Use terms like "linear structures," "blocky masses," or "tapered silhouettes" instead of functional names if the pixels are blurred.
-6. **Strict Length**: The description must be **exactly 2 to 3 sentences**.
+1. **Target Selection**: If multiple vessels are visible, describe only the vessel whose geometric center is closest to the image center. Ignore all other objects.
+
+2. **Scope Limitation**: Describe only the vessel’s visible physical structure, including hull, deck, superstructure, bridge, mast, cranes, or other clearly distinguishable components. 
+   - Do NOT describe water, wakes, docks, land, or other vessels.
+   - Do NOT describe spatial relationships (e.g., "next to", "moored at", "parallel to").
+
+3. **Objectivity Rule**:
+   - Describe only what is directly visible.
+   - Do NOT infer vessel type, nationality, function, or hidden equipment.
+   - Functional structural terms (e.g., hull, bridge, mast, deckhouse) are allowed only if clearly supported by visible shape.
+
+4. **Natural Professional Language**:
+   - Begin directly with visible physical features (e.g., "A long grey hull...", "A wide flat deck...").
+   - Do NOT begin with "The vessel", "The ship", "This vessel", or similar phrasing.
+   - Maintain clear, readable, professional report-style language.
+
+5. **Length Requirement**:
+   Provide 2 to 3 complete sentences.
 
 ### OUTPUT FORMAT
-Return the analysis strictly in the following JSON format:
+Return only valid JSON in the following format:
 
-{{
-  "visual_appearance": "[2-3 sentences only] A forensic summary starting directly with visual features (e.g., 'A long, tapered hull with...')."
-}}
+{
+  "visual_appearance": "2–3 sentence objective visual description starting directly with physical features."
+}
+"""
+
+APPEARANCE_SYS_PROMPT = """
+Describe the visual appearance of a ship in 2–3 sentences. Only describe the ship itself, including its structure, shape, proportions, color, materials, surface details, and visible components. Do not mention the environment, location, background, history, or any information unrelated to its physical appearance.
+
+Return the result strictly in JSON format with only the following field:
+{
+  "visual_appearance": "content"
+}
+
+Do not include any additional text, explanations, or extra fields.
 """
 
 

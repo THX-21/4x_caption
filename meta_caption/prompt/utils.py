@@ -1,4 +1,4 @@
-import os, json, re
+import os, json, re, math
 import rasterio
 
 def extract_normalized_info(tif_path, json_path):
@@ -98,9 +98,24 @@ def format_ship_spatial_text(analysis_results, top_k=8):
                 "Far"
             )
 
-            vertical = "Down" if dy > 0 else "Up"
-            horizontal = "Right" if dx > 0 else "Left"
-            dir_label = f"{vertical}-{horizontal}"
+            # Determine 8-direction label using degrees (45-degree sectors)
+            angle = math.degrees(math.atan2(dy, dx))
+            if -12 <= angle < 12:
+                dir_label = "Right"
+            elif 12 <= angle < 78:
+                dir_label = "Down-Right"
+            elif 78 <= angle < 102:
+                dir_label = "Down"
+            elif 102 <= angle < 168:
+                dir_label = "Down-Left"
+            elif angle >= 168 or angle < -168:
+                dir_label = "Left"
+            elif -168 <= angle < -102:
+                dir_label = "Up-Left"
+            elif -102 <= angle < -78:
+                dir_label = "Up"
+            else: # -78 <= angle < -12:
+                dir_label = "Up-Right"
 
             # ⭐ 核心修改：显式写 relative to
             line += (
